@@ -10437,6 +10437,7 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
   vec<location_t> arg_loc = vNULL;
   location_t start;
   location_t finish;
+  tree attrs = NULL_TREE;
 
   while (true)
     {
@@ -10456,6 +10457,16 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
 	  expr.original_code = ERROR_MARK;
 	  expr.original_type = NULL;
 	  break;
+	case CPP_KEYWORD:
+	  {
+	    if (c_parser_peek_token (parser)->keyword == RID_ATTRIBUTE)
+	      {
+		attrs = c_parser_gnu_attributes (parser);
+		/*TODO*/
+		break;
+	      }
+	    goto default_case;
+	  }
 	case CPP_OPEN_PAREN:
 	  /* Function call.  */
 	  c_parser_consume_token (parser);
@@ -10501,6 +10512,12 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
 	    = c_build_function_call_vec (expr_loc, arg_loc, expr.value,
 					 exprlist, origtypes);
 	  set_c_expr_source_range (&expr, start, finish);
+
+	  if (attrs)
+	    {
+	      /* TODO */
+	      attrs = NULL_TREE;
+	    }
 
 	  expr.original_code = ERROR_MARK;
 	  if (TREE_CODE (expr.value) == INTEGER_CST
@@ -10616,6 +10633,7 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
 	  expr.original_code = ERROR_MARK;
 	  expr.original_type = NULL;
 	  break;
+	default_case:
 	default:
 	  return expr;
 	}
