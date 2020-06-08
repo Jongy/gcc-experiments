@@ -149,6 +149,7 @@ enum gf_mask {
     GF_CALL_MUST_TAIL_CALL	= 1 << 9,
     GF_CALL_BY_DESCRIPTOR	= 1 << 10,
     GF_CALL_NOCF_CHECK		= 1 << 11,
+    GF_CALL_INLINE		= 1 << 11,
     GF_OMP_PARALLEL_COMBINED	= 1 << 0,
     GF_OMP_PARALLEL_GRID_PHONY = 1 << 1,
     GF_OMP_TASK_TASKLOOP	= 1 << 0,
@@ -2992,6 +2993,25 @@ gimple_call_set_nocf_check (gcall *gs, bool nocf_check)
     gs->subcode |= GF_CALL_NOCF_CHECK;
   else
     gs->subcode &= ~GF_CALL_NOCF_CHECK;
+}
+
+/* Return true if call GS is marked as inline.  */
+
+static inline bool
+gimple_call_inline_p (const gcall *gs)
+{
+  return (gs->subcode & GF_CALL_INLINE) != 0;
+}
+
+/* Mark call GS as inline  */
+
+static inline void
+gimple_call_set_inline (gcall *gs, bool inline_)
+{
+  if (inline_)
+    gs->subcode |= GF_CALL_INLINE;
+  else
+    gs->subcode &= ~GF_CALL_INLINE;
 }
 
 /* Return the target of internal call GS.  */
