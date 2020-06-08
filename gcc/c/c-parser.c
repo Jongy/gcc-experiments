@@ -10462,7 +10462,12 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
 	    if (c_parser_peek_token (parser)->keyword == RID_ATTRIBUTE)
 	      {
 		attrs = c_parser_gnu_attributes (parser);
-		/*TODO*/
+		/* Function call must follow */
+		if (c_parser_peek_token (parser)->type != CPP_OPEN_PAREN)
+		  {
+		    goto default_case;
+		  }
+
 		break;
 	      }
 	    goto default_case;
@@ -10515,7 +10520,16 @@ c_parser_postfix_expression_after_primary (c_parser *parser,
 
 	  if (attrs)
 	    {
-	      /* TODO */
+	      if (lookup_attribute ("inline", attrs) == NULL_TREE || TREE_CHAIN(attrs) != NULL_TREE)
+		{
+		  c_parser_error (parser, "unexpected attributes on function call");
+		  expr.set_error ();
+		  expr.original_code = ERROR_MARK;
+		  expr.original_type = NULL;
+		  return expr;
+		}
+	      /* Otherwise - it should be inlined. */
+	      CALL_EXPR_INLINE(expr.value) = 1;
 	      attrs = NULL_TREE;
 	    }
 

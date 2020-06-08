@@ -1316,6 +1316,9 @@ struct GTY(()) tree_base {
            all decls
 	   all types
 
+       CALL_EXPR_INLINE in
+	   CALL_EXIR
+
        IDENTIFIER_TRANSPARENT_ALIAS in
            IDENTIFIER_NODE
 

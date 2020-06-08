@@ -655,6 +655,10 @@ extern void omp_clause_range_check_failed (const_tree, const char *, int,
 #define CALL_EXPR_MUST_TAIL_CALL(NODE) \
   (CALL_EXPR_CHECK (NODE)->base.static_flag)
 
+/* Marks this CALL_EXPR for inlining. */
+#define CALL_EXPR_INLINE(NODE) \
+  (CALL_EXPR_CHECK (NODE)->base.deprecated_flag)
+
 /* Used as a temporary field on a CASE_LABEL_EXPR to indicate that the
    CASE_LOW operand has been processed.  */
 #define CASE_LOW_SEEN(NODE) \
