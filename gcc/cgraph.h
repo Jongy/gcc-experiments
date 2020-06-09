@@ -1985,6 +1985,8 @@ public:
   /* Set to true when caller is a constructor or destructor of polymorphic
      type.  */
   unsigned in_polymorphic_cdtor : 1;
+  /* Always inline this edge (set by "inline" attribute on the call site) */
+  unsigned force_inline_call : 1;
 
   /* Return true if call must bind to current definition.  */
   bool binds_to_current_def_p ();

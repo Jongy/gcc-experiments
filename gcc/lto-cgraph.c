@@ -271,6 +271,7 @@ lto_output_edge (struct lto_simple_output_block *ob, struct cgraph_edge *edge,
 	      || edge->inline_failed != CIF_BODY_NOT_AVAILABLE);
   bp_pack_value (&bp, edge->can_throw_external, 1);
   bp_pack_value (&bp, edge->in_polymorphic_cdtor, 1);
+  bp_pack_value (&bp, edge->call_stmt ? gimple_call_inline_p (edge->call_stmt) : edge->force_inline_call, 1);
   if (edge->indirect_unknown_callee)
     {
       int flags = edge->indirect_info->ecf_flags;
@@ -1484,6 +1485,7 @@ input_edge (class lto_input_block *ib, vec<symtab_node *> nodes,
   edge->call_stmt_cannot_inline_p = bp_unpack_value (&bp, 1);
   edge->can_throw_external = bp_unpack_value (&bp, 1);
   edge->in_polymorphic_cdtor = bp_unpack_value (&bp, 1);
+  edge->force_inline_call = bp_unpack_value (&bp, 1);
   if (indirect)
     {
       if (bp_unpack_value (&bp, 1))
