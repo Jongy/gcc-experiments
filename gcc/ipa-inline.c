@@ -2777,7 +2777,8 @@ ipa_inline (void)
   return remove_functions ? TODO_remove_functions : 0;
 }
 
-/* Inline always-inline function calls in NODE.  */
+/* Inline always-inline function calls in NODE, and calls marked with "inline" attribute that are
+   inlinable during early inlining.  */
 
 static bool
 inline_always_inline_functions (struct cgraph_node *node)
@@ -2788,7 +2789,7 @@ inline_always_inline_functions (struct cgraph_node *node)
   for (e = node->callees; e; e = e->next_callee)
     {
       struct cgraph_node *callee = e->callee->ultimate_alias_target ();
-      if (!DECL_DISREGARD_INLINE_LIMITS (callee->decl))
+      if (!DECL_DISREGARD_INLINE_LIMITS (callee->decl) && !gimple_call_inline_p (e->call_stmt))
 	continue;
 
       if (e->recursive_p ())
