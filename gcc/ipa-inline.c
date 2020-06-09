@@ -2279,6 +2279,49 @@ inline_small_functions (void)
   symtab->remove_edge_removal_hook (edge_removal_hook_holder);
 }
 
+/* Process "inline" attributes placed on specific calls.  This runs before all other inlining heuristics. */
+
+static void
+inline_calls_by_inline_attribute (void)
+{
+  struct cgraph_node *node;
+
+  FOR_EACH_FUNCTION (node)
+    {
+      struct cgraph_edge *e;
+
+      for (e = node->callees; e; e = e->next_callee)
+	{
+	  if (!e->inline_failed)
+	    {
+	      /* Already inlined (this runs after flattening) */
+	      continue;
+	    }
+
+	  if (e->recursive_p ())
+	    {
+	      /* Don't inline recursive call */
+	      /* TODO: error on this. */
+	      continue;
+	    }
+
+	  if (!can_inline_edge_p (e, false))
+	    {
+	      /* Not inlinable due to technical reasons (i.e, not related heuristics and/or limits) */
+	      /* TODO: error on this. */
+	      continue;
+	    }
+
+	  /* TODO: I probably miss more cases of "unable to inline" here */
+
+	  if (e->force_inline_call)
+	    {
+	      inline_call (e, true, NULL, NULL, false);
+	    }
+	}
+    }
+}
+
 /* Flatten NODE.  Performed both during early inlining and
    at IPA inlining time.  */
 
@@ -2625,6 +2668,9 @@ ipa_inline (void)
 	    initialize_inline_failed (e);
 	}
     }
+
+  /* First thing after recomputing the reasons for inlining. */
+  inline_calls_by_inline_attribute ();
 
   if (dump_file)
     fprintf (dump_file, "\nFlattening functions:\n");
